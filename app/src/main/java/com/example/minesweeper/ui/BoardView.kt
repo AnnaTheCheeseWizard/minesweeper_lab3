@@ -23,8 +23,7 @@ import com.example.minesweeper.solver.MoveReason
 import kotlin.math.min
 
 /**
- * Custom view that draws the minesweeper board on a Canvas and translates touches into
- * cell taps (reveal / chord) and long presses (flag).
+ * Custom view that draws the minesweeper board on a Canvas with square cells and customizable board themes.
  */
 class BoardView @JvmOverloads constructor(
     context: Context,
@@ -41,6 +40,15 @@ class BoardView @JvmOverloads constructor(
 
     private var board: Board? = null
     private var hints: List<Move> = emptyList()
+    var currentTheme: BoardTheme = BoardTheme.DEFAULT
+        private set
+
+    /** Custom flag color override (-1 means use theme default). */
+    var customFlagColor: Int = -1
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     private var cellSize = 0f
     private var originX = 0f
@@ -59,47 +67,29 @@ class BoardView @JvmOverloads constructor(
         typeface = Typeface.DEFAULT_BOLD
     }
 
-    private val numberColors = IntArray(9)
-
-    private val colorBackground = color(R.color.board_background)
-    private val colorHidden = color(R.color.cell_hidden)
-    private val colorHiddenEdge = color(R.color.cell_hidden_edge)
-    private val colorHiddenShadow = color(R.color.cell_hidden_shadow)
-    private val colorRevealed = color(R.color.cell_revealed)
     private val colorExploded = color(R.color.cell_exploded)
-    private val colorMine = color(R.color.mine)
-    private val colorFlag = color(R.color.flag)
     private val colorHintSafe = color(R.color.hint_safe)
     private val colorHintMine = color(R.color.hint_mine)
     private val colorHintGuess = color(R.color.hint_guess)
-
-    init {
-        numberColors[1] = color(R.color.number_1)
-        numberColors[2] = color(R.color.number_2)
-        numberColors[3] = color(R.color.number_3)
-        numberColors[4] = color(R.color.number_4)
-        numberColors[5] = color(R.color.number_5)
-        numberColors[6] = color(R.color.number_6)
-        numberColors[7] = color(R.color.number_7)
-        numberColors[8] = color(R.color.number_8)
-    }
 
     private val gestureDetector = GestureDetector(
         context,
         object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean = true
 
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 performClick()
-                withCellAt(e.x, e.y) { row, col -> listener?.onCellTap(row, col) }
-                return true
-            }
-
-            override fun onLongPress(e: MotionEvent) {
                 withCellAt(e.x, e.y) { row, col ->
                     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     listener?.onCellLongPress(row, col)
                 }
+                return true
+            }
+
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                performClick()
+                withCellAt(e.x, e.y) { row, col -> listener?.onCellTap(row, col) }
+                return true
             }
         },
     )
@@ -107,6 +97,11 @@ class BoardView @JvmOverloads constructor(
     fun bind(board: Board) {
         this.board = board
         this.hints = emptyList()
+        invalidate()
+    }
+
+    fun setTheme(theme: BoardTheme) {
+        this.currentTheme = theme
         invalidate()
     }
 
@@ -129,12 +124,12 @@ class BoardView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         val board = board ?: return
-        canvas.drawColor(colorBackground)
+        canvas.drawColor(currentTheme.surfaceColor)
 
         cellSize = min(width.toFloat() / board.cols, height.toFloat() / board.rows)
         originX = (width - cellSize * board.cols) / 2f
         originY = (height - cellSize * board.rows) / 2f
-        val gap = maxOf(1f, cellSize * 0.04f)
+        val gap = maxOf(0.5f, cellSize * 0.04f)
         textPaint.textSize = cellSize * 0.62f
 
         val finished = board.isFinished
@@ -149,35 +144,36 @@ class BoardView @JvmOverloads constructor(
                     originY + (row + 1) * cellSize - gap,
                 )
                 val state = board.stateAt(row, col)
-                // Mines are only looked at once the game is over.
                 val isMine = finished && board.isMine(row, col)
                 val exploded = lost && board.index(row, col) == board.explodedIndex
+                val isEven = (row + col) % 2 == 0
+                val hiddenBg = if (isEven) currentTheme.cellHidden else currentTheme.cellHiddenAlt
+                val revealedBg = if (isEven) currentTheme.cellRevealed else currentTheme.cellRevealedAlt
 
                 when {
                     state == CellState.REVEALED && isMine -> {
-                        drawRevealedBackground(canvas, if (exploded) colorExploded else colorRevealed)
+                        drawCellBackground(canvas, if (exploded) colorExploded else revealedBg)
                         drawMine(canvas)
                     }
                     state == CellState.REVEALED -> {
-                        drawRevealedBackground(canvas, colorRevealed)
+                        drawCellBackground(canvas, revealedBg)
                         val number = board.adjacentMines(row, col)
                         if (number > 0) drawNumber(canvas, number)
                     }
                     state == CellState.FLAGGED && lost && !isMine -> {
-                        // Wrong flag: show the cell as revealed with a crossed-out flag.
-                        drawRevealedBackground(canvas, colorRevealed)
+                        drawCellBackground(canvas, revealedBg)
                         drawFlag(canvas)
                         drawCross(canvas)
                     }
                     state == CellState.FLAGGED -> {
-                        drawHiddenBackground(canvas)
+                        drawCellBackground(canvas, hiddenBg)
                         drawFlag(canvas)
                     }
                     lost && isMine -> {
-                        drawRevealedBackground(canvas, colorRevealed)
+                        drawCellBackground(canvas, revealedBg)
                         drawMine(canvas)
                     }
-                    else -> drawHiddenBackground(canvas)
+                    else -> drawCellBackground(canvas, hiddenBg)
                 }
             }
         }
@@ -185,25 +181,16 @@ class BoardView @JvmOverloads constructor(
         drawHints(canvas, board)
     }
 
-    private fun drawHiddenBackground(canvas: Canvas) {
-        val bevel = maxOf(1.5f, cellSize * 0.07f)
-        fillPaint.color = colorHiddenShadow
-        canvas.drawRect(rect, fillPaint)
-        fillPaint.color = colorHiddenEdge
-        canvas.drawRect(rect.left, rect.top, rect.right - bevel, rect.bottom - bevel, fillPaint)
-        fillPaint.color = colorHidden
-        canvas.drawRect(
-            rect.left + bevel, rect.top + bevel, rect.right - bevel, rect.bottom - bevel, fillPaint,
-        )
-    }
-
-    private fun drawRevealedBackground(canvas: Canvas, color: Int) {
+    private fun drawCellBackground(canvas: Canvas, color: Int) {
+        val cornerRadius = maxOf(3f, cellSize * 0.15f)
         fillPaint.color = color
-        canvas.drawRect(rect, fillPaint)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, fillPaint)
     }
 
     private fun drawNumber(canvas: Canvas, number: Int) {
-        textPaint.color = numberColors[number]
+        if (number in 1..8) {
+            textPaint.color = currentTheme.numberColors[number]
+        }
         val metrics = textPaint.fontMetrics
         val y = rect.centerY() - (metrics.ascent + metrics.descent) / 2f
         canvas.drawText(number.toString(), rect.centerX(), y, textPaint)
@@ -213,16 +200,19 @@ class BoardView @JvmOverloads constructor(
         val cx = rect.centerX()
         val cy = rect.centerY()
         val radius = cellSize * 0.22f
+        val coreRadius = cellSize * 0.08f
         val spike = cellSize * 0.34f
-        strokePaint.color = colorMine
+        strokePaint.color = currentTheme.mineColor
         strokePaint.strokeWidth = maxOf(1.5f, cellSize * 0.07f)
         canvas.drawLine(cx - spike, cy, cx + spike, cy, strokePaint)
         canvas.drawLine(cx, cy - spike, cx, cy + spike, strokePaint)
         val diagonal = spike * 0.72f
         canvas.drawLine(cx - diagonal, cy - diagonal, cx + diagonal, cy + diagonal, strokePaint)
         canvas.drawLine(cx - diagonal, cy + diagonal, cx + diagonal, cy - diagonal, strokePaint)
-        fillPaint.color = colorMine
+        fillPaint.color = currentTheme.mineColor
         canvas.drawCircle(cx, cy, radius, fillPaint)
+        fillPaint.color = currentTheme.mineCoreColor
+        canvas.drawCircle(cx, cy, coreRadius, fillPaint)
     }
 
     private fun drawFlag(canvas: Canvas) {
@@ -230,16 +220,16 @@ class BoardView @JvmOverloads constructor(
         val top = rect.top + cellSize * 0.2f
         val bottom = rect.bottom - cellSize * 0.2f
         val poleX = cx - cellSize * 0.04f
-        strokePaint.color = colorMine
+        strokePaint.color = currentTheme.mineColor
         strokePaint.strokeWidth = maxOf(1.5f, cellSize * 0.07f)
         canvas.drawLine(poleX, top, poleX, bottom, strokePaint)
         canvas.drawLine(cx - cellSize * 0.2f, bottom, cx + cellSize * 0.2f, bottom, strokePaint)
         path.reset()
         path.moveTo(poleX, top)
-        path.lineTo(poleX + cellSize * 0.3f, top + cellSize * 0.15f)
+        path.lineTo(poleX + cellSize * 0.32f, top + cellSize * 0.15f)
         path.lineTo(poleX, top + cellSize * 0.3f)
         path.close()
-        fillPaint.color = colorFlag
+        fillPaint.color = if (customFlagColor != -1) customFlagColor else currentTheme.flagColor
         canvas.drawPath(path, fillPaint)
     }
 
@@ -253,7 +243,8 @@ class BoardView @JvmOverloads constructor(
 
     private fun drawHints(canvas: Canvas, board: Board) {
         if (hints.isEmpty()) return
-        strokePaint.strokeWidth = maxOf(2f, cellSize * 0.10f)
+        strokePaint.strokeWidth = maxOf(2.5f, cellSize * 0.10f)
+        val cornerRadius = maxOf(3f, cellSize * 0.15f)
         for (move in hints) {
             strokePaint.color = when {
                 move.reason == MoveReason.GUESS || move.reason == MoveReason.FIRST_MOVE -> colorHintGuess
@@ -268,7 +259,7 @@ class BoardView @JvmOverloads constructor(
                 originY + (move.row + 1) * cellSize - inset,
             )
             if (move.row in 0 until board.rows && move.col in 0 until board.cols) {
-                canvas.drawRect(rect, strokePaint)
+                canvas.drawRoundRect(rect, cornerRadius, cornerRadius, strokePaint)
             }
         }
     }

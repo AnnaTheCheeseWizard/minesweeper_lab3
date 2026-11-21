@@ -5,11 +5,33 @@
     <!-- Menu -->
     <string name="menu_new_game">New game</string>
     <string name="menu_difficulty">Difficulty</string>
+    <string name="menu_theme">Theme</string>
     <string name="menu_language">Language</string>
+    <string name="menu_flag_color">Flag color</string>
+
+    <string name="theme_lilies">Pond of Lilies</string>
+    <string name="theme_plum_olive">Plum &amp; Olive</string>
+    <string name="theme_cotton_candy">Cotton Candy</string>
+    <string name="theme_silk_touch">Silk Touch</string>
+    <string name="theme_lavender_mint">Lavender &amp; Mint</string>
+
+    <!-- Flag colors -->
+    <string name="flag_color_blue">Blue</string>
+    <string name="flag_color_red">Red</string>
+    <string name="flag_color_green">Green</string>
+    <string name="flag_color_yellow">Yellow</string>
+    <string name="flag_color_pink">Pink</string>
+    <string name="flag_color_white">White</string>
+    <string name="flag_color_black">Black</string>
+    <string name="flag_color_default">Default</string>
 
     <!-- Status bar -->
     <string name="label_mines">Mines: %1$03d</string>
     <string name="label_time">Time: %1$03d</string>
+    <string name="label_best">Best: %1$s</string>
+    <string name="label_best_none">--</string>
+    <string name="btn_difficulty">Difficulty</string>
+    <string name="difficulty_button_format">%1$s ▾</string>
     <string name="btn_restart">Restart</string>
     <string name="board_description">Minesweeper board</string>
 
@@ -38,10 +60,10 @@
     <string name="language_system">System default</string>
     <string name="language_en" translatable="false">English</string>
     <string name="language_uk" translatable="false">Українська</string>
-    <string name="language_pl" translatable="false">Polski</string>
+    <string name="language_he" translatable="false">עברית</string>
 
     <!-- Hints and solver messages -->
-    <string name="hint_default">Tap to reveal, long-press to flag, tap a number to chord.</string>
+    <string name="hint_default">Tap once to flag, double-tap to reveal or chord.</string>
     <string name="hint_none">The solver has no move for this position.</string>
     <plurals name="hint_moves_found">
         <item quantity="one">%d certain move found</item>
@@ -62,6 +84,7 @@
 
     <!-- Game result dialog -->
     <string name="result_won_title">You won!</string>
+    <string name="result_new_record">New record! Time: %1$s</string>
     <string name="result_lost_title">Boom! Game over</string>
     <string name="result_message">Time: %1$s</string>
     <string name="dialog_new_game">New game</string>

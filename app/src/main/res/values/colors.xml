@@ -1,25 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="board_background">#FF9E9E9E</color>
-    <color name="cell_hidden">#FFCFD8DC</color>
-    <color name="cell_hidden_edge">#FFFFFFFF</color>
-    <color name="cell_hidden_shadow">#FF78909C</color>
-    <color name="cell_revealed">#FFECEFF1</color>
-    <color name="cell_exploded">#FFEF5350</color>
-    <color name="mine">#FF212121</color>
-    <color name="flag">#FFD32F2F</color>
-    <color name="hint_safe">#FF2E7D32</color>
-    <color name="hint_mine">#FFC62828</color>
-    <color name="hint_guess">#FFF9A825</color>
+    <!-- Brand / Theme Palette -->
+    <color name="primary">#388E2A</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#7EBF50</color>
+    <color name="on_primary_container">#FFFFFF</color>
 
-    <color name="number_1">#FF1565C0</color>
-    <color name="number_2">#FF2E7D32</color>
-    <color name="number_3">#FFD32F2F</color>
-    <color name="number_4">#FF4A148C</color>
-    <color name="number_5">#FF8D1D12</color>
-    <color name="number_6">#FF00838F</color>
-    <color name="number_7">#FF000000</color>
-    <color name="number_8">#FF616161</color>
+    <color name="secondary">#E1788B</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#E59EAB</color>
+    <color name="on_secondary_container">#FFFFFF</color>
 
-    <color name="ic_launcher_background">#FF2E7D32</color>
+    <color name="surface">#388E2A</color>
+    <color name="surface_variant">#7EBF50</color>
+    <color name="on_surface">#FFFFFF</color>
+    <color name="outline">#98CE71</color>
+
+    <!-- Card & Button Backgrounds -->
+    <color name="card_stat_background">#E1788B</color>
+    <color name="card_stat_stroke">#E59EAB</color>
+    <color name="card_stat_text">#FFFFFF</color>
+
+    <color name="card_board_background">#388E2A</color>
+    <color name="card_board_stroke">#7EBF50</color>
+
+    <!-- Board Drawing Colors -->
+    <color name="board_background">#388E2A</color>
+
+    <!-- Hidden Field Cells: #7EBF50 & #98CE71 Checkerboard -->
+    <color name="cell_hidden">#7EBF50</color>
+    <color name="cell_hidden_alt">#98CE71</color>
+    <color name="cell_hidden_edge">#98CE71</color>
+    <color name="cell_hidden_shadow">#388E2A</color>
+
+    <!-- Solved Field Cells: #E1788B & #E59EAB Checkerboard -->
+    <color name="cell_revealed">#E1788B</color>
+    <color name="cell_revealed_alt">#E59EAB</color>
+
+    <color name="cell_exploded">#D32F2F</color>
+    <color name="mine">#212121</color>
+    <color name="mine_core">#FFFFFF</color>
+    <color name="flag">#FFFFFF</color>
+
+    <color name="hint_safe">#7EBF50</color>
+    <color name="hint_mine">#D32F2F</color>
+    <color name="hint_guess">#FFB74D</color>
+
+    <!-- Number Colors (High contrast on pink cells) -->
+    <color name="number_1">#1565C0</color>
+    <color name="number_2">#1B5E20</color>
+    <color name="number_3">#C62828</color>
+    <color name="number_4">#4A148C</color>
+    <color name="number_5">#4E342E</color>
+    <color name="number_6">#00695C</color>
+    <color name="number_7">#212121</color>
+    <color name="number_8">#37474F</color>
+
+    <color name="ic_launcher_background">#388E2A</color>
 </resources>

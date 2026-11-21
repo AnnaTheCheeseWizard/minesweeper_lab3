@@ -29,7 +29,7 @@ class BoardTest {
         for (r in 0 until board.rows) for (c in 0 until board.cols) {
             if (board.isMine(r, c)) mines++
         }
-        assertEquals(99, mines)
+        assertEquals(Difficulty.EXPERT.mines, mines)
     }
 
     @Test

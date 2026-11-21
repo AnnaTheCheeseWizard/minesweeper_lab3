@@ -1,16 +1,27 @@
 package com.example.minesweeper
 
 import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Color
+import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckedTextView
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.minesweeper.game.CellState
 import com.example.minesweeper.game.Difficulty
@@ -19,9 +30,15 @@ import com.example.minesweeper.solver.Move
 import com.example.minesweeper.solver.MoveAction
 import com.example.minesweeper.solver.MoveReason
 import com.example.minesweeper.solver.MinesweeperSolver
+import com.example.minesweeper.ui.BoardTheme
 import com.example.minesweeper.ui.BoardView
+import com.example.minesweeper.ui.FlagColorChoiceAdapter
+import com.example.minesweeper.ui.FlagColorInfo
+import com.example.minesweeper.ui.ThemeChoiceAdapter
 import com.example.minesweeper.util.LanguageManager
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import timber.log.Timber
 import kotlin.math.roundToInt
@@ -32,11 +49,24 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
     private val solver = MinesweeperSolver()
     private val handler = Handler(Looper.getMainLooper())
 
+    private lateinit var rootView: View
+    private lateinit var toolbar: MaterialToolbar
     private lateinit var boardView: BoardView
     private lateinit var minesText: TextView
     private lateinit var timerText: TextView
+    private lateinit var bestTimeText: TextView
+    private lateinit var difficultyButton: Button
     private lateinit var hintText: TextView
     private lateinit var autoButton: Button
+
+    private lateinit var bestTimeCard: MaterialCardView
+    private lateinit var minesCard: MaterialCardView
+    private lateinit var timerCard: MaterialCardView
+    private lateinit var boardCard: MaterialCardView
+    private lateinit var hintCard: MaterialCardView
+    private lateinit var restartButton: Button
+    private lateinit var hintButton: Button
+    private lateinit var stepButton: Button
 
     private var autoRunning = false
 
@@ -64,29 +94,49 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         Timber.d("onCreate (recreated=%b)", savedInstanceState != null)
         setContentView(R.layout.activity_main)
 
-        val root = findViewById<android.view.View>(R.id.root)
-        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+        rootView = findViewById(R.id.root)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
 
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         boardView = findViewById(R.id.boardView)
         minesText = findViewById(R.id.minesText)
         timerText = findViewById(R.id.timerText)
+        bestTimeText = findViewById(R.id.bestTimeText)
+        difficultyButton = findViewById(R.id.difficultyButton)
         hintText = findViewById(R.id.hintText)
         autoButton = findViewById(R.id.autoButton)
 
+        bestTimeCard = findViewById(R.id.bestTimeCard)
+        minesCard = findViewById(R.id.minesCard)
+        timerCard = findViewById(R.id.timerCard)
+        boardCard = findViewById(R.id.boardCard)
+        hintCard = findViewById(R.id.hintCard)
+        restartButton = findViewById(R.id.restartButton)
+        hintButton = findViewById(R.id.hintButton)
+        stepButton = findViewById(R.id.stepButton)
+
         boardView.listener = this
-        findViewById<Button>(R.id.restartButton).setOnClickListener { startNewGame(viewModel.difficulty) }
-        findViewById<Button>(R.id.hintButton).setOnClickListener { showHint() }
-        findViewById<Button>(R.id.stepButton).setOnClickListener {
+        difficultyButton.setOnClickListener { showDifficultyDialog() }
+        restartButton.setOnClickListener { startNewGame(viewModel.difficulty) }
+        hintButton.setOnClickListener { showHint() }
+        stepButton.setOnClickListener {
             stopAuto()
             performSolverStep()
         }
         autoButton.setOnClickListener { if (autoRunning) stopAuto() else startAuto() }
+
+        val activeTheme = loadTheme()
+        applyBoardTheme(activeTheme)
+
+        // Load and apply saved flag color
+        val savedFlagColor = viewModel.loadFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE))
+        boardView.customFlagColor = savedFlagColor
 
         viewModel.initIfNeeded(loadDifficulty())
         boardView.bind(viewModel.board)
@@ -113,12 +163,12 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_new_game -> {
-                startNewGame(viewModel.difficulty)
+            R.id.action_theme -> {
+                showThemeDialog()
                 true
             }
-            R.id.action_difficulty -> {
-                showDifficultyDialog()
+            R.id.action_flag_color -> {
+                showFlagColorDialog()
                 true
             }
             R.id.action_language -> {
@@ -129,39 +179,202 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         }
     }
 
+    private fun showThemeDialog() {
+        val themes = BoardTheme.entries
+        val names = themes.map { getString(it.nameRes) }
+        val activeTheme = loadTheme()
+        val adapter = ThemeChoiceAdapter(themes, names, activeTheme.primaryCardText)
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.menu_theme)
+            .setSingleChoiceItems(adapter, themes.indexOf(activeTheme)) { dialogInterface, which ->
+                val selected = themes[which]
+                saveTheme(selected)
+                applyBoardTheme(selected)
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton(R.string.dialog_close, null)
+            .create()
+
+        dialog.show()
+        styleDialog(dialog, activeTheme)
+    }
+
+    private fun applyBoardTheme(theme: BoardTheme) {
+        rootView.setBackgroundColor(theme.surfaceColor)
+        toolbar.setBackgroundColor(theme.toolbarColor)
+        toolbar.setTitleTextColor(theme.primaryCardText)
+
+        bestTimeCard.setCardBackgroundColor(theme.primaryCardColor)
+        bestTimeCard.strokeColor = theme.secondaryCardColor
+        bestTimeText.setTextColor(theme.primaryCardText)
+
+        minesCard.setCardBackgroundColor(theme.primaryCardColor)
+        minesCard.strokeColor = theme.secondaryCardColor
+        minesText.setTextColor(theme.primaryCardText)
+
+        timerCard.setCardBackgroundColor(theme.primaryCardColor)
+        timerCard.strokeColor = theme.secondaryCardColor
+        timerText.setTextColor(theme.primaryCardText)
+
+        (difficultyButton as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.primaryCardColor)
+        difficultyButton.setTextColor(theme.primaryCardText)
+
+        (restartButton as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.secondaryCardColor)
+        restartButton.setTextColor(theme.secondaryCardText)
+
+        (hintButton as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.secondaryCardColor)
+        hintButton.setTextColor(theme.secondaryCardText)
+
+        (stepButton as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.secondaryCardColor)
+        stepButton.setTextColor(theme.secondaryCardText)
+
+        (autoButton as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.primaryCardColor)
+        autoButton.setTextColor(theme.primaryCardText)
+
+        hintCard.setCardBackgroundColor(theme.hintCardColor)
+        hintCard.strokeColor = theme.secondaryCardColor
+        hintText.setTextColor(theme.hintCardText)
+
+        boardCard.setCardBackgroundColor(theme.surfaceColor)
+        boardCard.strokeColor = theme.hintCardColor
+
+        boardView.setTheme(theme)
+        applySystemBarIcons(theme)
+    }
+
+    /** Keeps status/navigation bar icons readable on both light and dark themes. */
+    private fun showFlagColorDialog() {
+        val activeTheme = loadTheme()
+        val currentFlagColor = viewModel.flagColor
+        val flagColors = listOf(
+            FlagColorInfo(R.string.flag_color_default, -1, true),
+            FlagColorInfo(R.string.flag_color_blue, Color.parseColor("#2196F3")),
+            FlagColorInfo(R.string.flag_color_red, Color.parseColor("#F44336")),
+            FlagColorInfo(R.string.flag_color_green, Color.parseColor("#4CAF50")),
+            FlagColorInfo(R.string.flag_color_yellow, Color.parseColor("#FFEB3B")),
+            FlagColorInfo(R.string.flag_color_pink, Color.parseColor("#E91E63")),
+            FlagColorInfo(R.string.flag_color_white, Color.parseColor("#FFFFFF")),
+            FlagColorInfo(R.string.flag_color_black, Color.parseColor("#212121")),
+        )
+        val selectedIndex = flagColors.indexOfFirst { fc ->
+            if (fc.isDefault) currentFlagColor == -1 else fc.color == currentFlagColor
+        }
+        val adapter = FlagColorChoiceAdapter(flagColors, currentFlagColor, activeTheme.primaryCardText)
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.menu_flag_color)
+            .setSingleChoiceItems(adapter, selectedIndex) { dialogInterface, which ->
+                val selected = flagColors[which]
+                viewModel.saveFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE), selected.color)
+                boardView.customFlagColor = selected.color
+                updateStatusTexts()
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton(R.string.dialog_close, null)
+            .create()
+
+        dialog.show()
+        styleDialog(dialog, activeTheme)
+    }
+
+    private fun applySystemBarIcons(theme: BoardTheme) {
+        val lightBackground = ColorUtils.calculateLuminance(theme.surfaceColor) > 0.5
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = lightBackground
+            isAppearanceLightNavigationBars = lightBackground
+        }
+    }
+
     private fun showDifficultyDialog() {
         val values = Difficulty.values()
         val labels = values.map { difficultyLabel(it) }.toTypedArray()
-        MaterialAlertDialogBuilder(this)
+        val activeTheme = loadTheme()
+        val adapter = createThemedSingleChoiceAdapter(labels, activeTheme)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.menu_difficulty)
-            .setSingleChoiceItems(labels, values.indexOf(viewModel.difficulty)) { dialog, which ->
+            .setSingleChoiceItems(adapter, values.indexOf(viewModel.difficulty)) { dialogInterface, which ->
                 saveDifficulty(values[which])
                 startNewGame(values[which])
-                dialog.dismiss()
+                dialogInterface.dismiss()
             }
-            .show()
+            .setNegativeButton(R.string.dialog_close, null)
+            .create()
+
+        dialog.show()
+        styleDialog(dialog, activeTheme)
     }
 
     private fun showLanguageDialog() {
         val labels = LanguageManager.options.map { getString(it.labelRes) }.toTypedArray()
-        MaterialAlertDialogBuilder(this)
+        val activeTheme = loadTheme()
+        val adapter = createThemedSingleChoiceAdapter(labels, activeTheme)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.menu_language)
-            .setSingleChoiceItems(labels, LanguageManager.currentIndex()) { dialog, which ->
-                dialog.dismiss()
-                // AppCompat recreates the activity; the ViewModel keeps the game alive.
+            .setSingleChoiceItems(adapter, LanguageManager.currentIndex()) { dialogInterface, which ->
+                dialogInterface.dismiss()
                 LanguageManager.select(which)
             }
-            .show()
+            .setNegativeButton(R.string.dialog_close, null)
+            .create()
+
+        dialog.show()
+        styleDialog(dialog, activeTheme)
+    }
+
+    private fun createThemedSingleChoiceAdapter(labels: Array<String>, theme: BoardTheme): ArrayAdapter<String> {
+        return object : ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, labels) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                if (view is TextView) {
+                    view.setTextColor(theme.primaryCardText)
+                    if (view is CheckedTextView) {
+                        view.checkMarkTintList = ColorStateList.valueOf(theme.secondaryCardColor)
+                    }
+                }
+                return view
+            }
+        }
+    }
+
+    private fun styleDialog(dialog: AlertDialog, theme: BoardTheme) {
+        val drawable = GradientDrawable().apply {
+            setColor(theme.surfaceColor)
+            setStroke(dpToPx(2), theme.secondaryCardColor)
+            cornerRadius = dpToPx(16).toFloat()
+        }
+        dialog.window?.setBackgroundDrawable(drawable)
+
+        dialog.findViewById<TextView>(androidx.appcompat.R.id.alertTitle)?.setTextColor(theme.primaryCardText)
+        dialog.findViewById<TextView>(android.R.id.message)?.setTextColor(theme.primaryCardText)
+
+        val positiveBtn = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        if (positiveBtn != null) {
+            positiveBtn.setTextColor(theme.primaryCardText)
+            (positiveBtn as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.primaryCardColor)
+        }
+
+        val negativeBtn = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+        if (negativeBtn != null) {
+            negativeBtn.setTextColor(theme.secondaryCardText)
+            (negativeBtn as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(theme.secondaryCardColor)
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun difficultyLabel(difficulty: Difficulty): String {
-        val name = when (difficulty) {
+        val name = difficultyShortName(difficulty)
+        val mines = resources.getQuantityString(R.plurals.mines_count, difficulty.mines, difficulty.mines)
+        return getString(R.string.difficulty_item, name, difficulty.cols, difficulty.rows, mines)
+    }
+
+    private fun difficultyShortName(difficulty: Difficulty): String {
+        return when (difficulty) {
             Difficulty.BEGINNER -> getString(R.string.difficulty_beginner)
             Difficulty.INTERMEDIATE -> getString(R.string.difficulty_intermediate)
             Difficulty.EXPERT -> getString(R.string.difficulty_expert)
         }
-        val mines = resources.getQuantityString(R.plurals.mines_count, difficulty.mines, difficulty.mines)
-        return getString(R.string.difficulty_item, name, difficulty.cols, difficulty.rows, mines)
     }
 
     // ---------------------------------------------------------------- touch input
@@ -191,6 +404,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     private fun showHint() {
         stopAuto()
+        viewModel.isAssisted = true
         val board = viewModel.board
         if (board.isFinished) return
         val moves = solver.solve(board.snapshot())
@@ -203,6 +417,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
      * @return true if the solver found something to do
      */
     private fun performSolverStep(): Boolean {
+        viewModel.isAssisted = true
         val board = viewModel.board
         if (board.isFinished) return false
 
@@ -270,6 +485,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     private fun startAuto() {
         if (viewModel.board.isFinished) return
+        viewModel.isAssisted = true
         autoRunning = true
         autoButton.setText(R.string.btn_stop)
         Timber.i("Auto-solve started")
@@ -307,29 +523,66 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         if (viewModel.board.isFinished && !viewModel.resultShown) {
             viewModel.resultShown = true
             stopAuto()
-            showResultDialog()
+            val won = viewModel.board.status == GameStatus.WON
+            var isNewRecord = false
+            if (won && !viewModel.isAssisted) {
+                isNewRecord = saveBestTimeIfNeeded(viewModel.difficulty, viewModel.elapsedSeconds())
+                updateStatusTexts()
+            }
+            showResultDialog(isNewRecord)
         }
     }
 
     private fun updateStatusTexts() {
         val board = viewModel.board
+        val difficulty = viewModel.difficulty
         minesText.text = getString(R.string.label_mines, board.minesLeft)
         timerText.text = getString(R.string.label_time, viewModel.elapsedSeconds())
+
+        val bestTime = getBestTime(difficulty)
+        val bestTimeString = if (bestTime >= 0) {
+            resources.getQuantityString(R.plurals.seconds_count, bestTime, bestTime)
+        } else {
+            getString(R.string.label_best_none)
+        }
+        bestTimeText.text = getString(R.string.label_best, bestTimeString)
+        difficultyButton.text = getString(R.string.difficulty_button_format, difficultyShortName(difficulty))
     }
 
-    private fun showResultDialog() {
+    private fun showResultDialog(isNewRecord: Boolean = false) {
         val won = viewModel.board.status == GameStatus.WON
         val seconds = viewModel.elapsedSeconds()
         val time = resources.getQuantityString(R.plurals.seconds_count, seconds, seconds)
-        MaterialAlertDialogBuilder(this)
+        val message = if (isNewRecord) {
+            getString(R.string.result_new_record, time)
+        } else {
+            getString(R.string.result_message, time)
+        }
+        val activeTheme = loadTheme()
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(if (won) R.string.result_won_title else R.string.result_lost_title)
-            .setMessage(getString(R.string.result_message, time))
+            .setMessage(message)
             .setPositiveButton(R.string.dialog_new_game) { _, _ -> startNewGame(viewModel.difficulty) }
             .setNegativeButton(R.string.dialog_close, null)
-            .show()
+            .create()
+
+        dialog.show()
+        styleDialog(dialog, activeTheme)
     }
 
     // ---------------------------------------------------------------- persistence
+
+    private fun loadTheme(): BoardTheme {
+        val id = getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_THEME, null)
+        return BoardTheme.fromId(id)
+    }
+
+    private fun saveTheme(theme: BoardTheme) {
+        getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_THEME, theme.id)
+            .apply()
+    }
 
     private fun loadDifficulty(): Difficulty {
         val name = getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_DIFFICULTY, null)
@@ -343,9 +596,28 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
             .apply()
     }
 
+    private fun getBestTime(difficulty: Difficulty): Int {
+        return getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_BEST_TIME_PREFIX + difficulty.name, -1)
+    }
+
+    private fun saveBestTimeIfNeeded(difficulty: Difficulty, seconds: Int): Boolean {
+        val currentBest = getBestTime(difficulty)
+        if (currentBest == -1 || seconds < currentBest) {
+            getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit()
+                .putInt(KEY_BEST_TIME_PREFIX + difficulty.name, seconds)
+                .apply()
+            return true
+        }
+        return false
+    }
+
     private companion object {
         const val PREFS = "minesweeper"
+        const val KEY_THEME = "theme"
         const val KEY_DIFFICULTY = "difficulty"
+        const val KEY_BEST_TIME_PREFIX = "best_time_"
         const val TIMER_INTERVAL_MS = 500L
         const val AUTO_DELAY_MS = 500L
     }

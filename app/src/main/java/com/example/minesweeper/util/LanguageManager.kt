@@ -19,17 +19,20 @@ object LanguageManager {
         Option(null, R.string.language_system),
         Option("en", R.string.language_en),
         Option("uk", R.string.language_uk),
-        Option("pl", R.string.language_pl),
+        Option("he", R.string.language_he),
     )
 
     /** Index in [options] of the language currently selected by the user. */
     fun currentIndex(): Int {
         val locales = AppCompatDelegate.getApplicationLocales()
         if (locales.size() == 0) return 0
-        val language = locales[0]?.language ?: return 0
+        val language = normalize(locales[0]?.language ?: return 0)
         val index = options.indexOfFirst { it.tag == language }
         return if (index >= 0) index else 0
     }
+
+    /** Older Java/Android versions report Hebrew as the legacy code "iw"; the tags above use "he". */
+    private fun normalize(language: String): String = if (language == "iw") "he" else language
 
     fun select(index: Int) {
         val option = options[index]

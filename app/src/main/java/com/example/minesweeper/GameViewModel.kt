@@ -1,5 +1,7 @@
 package com.example.minesweeper
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import com.example.minesweeper.game.Board
@@ -21,6 +23,13 @@ class GameViewModel : ViewModel() {
     /** True once the "you won / you lost" dialog has been shown for the current game. */
     var resultShown: Boolean = false
 
+    /** True if solver hints, solver steps, or auto-solve were used during the current game. */
+    var isAssisted: Boolean = false
+
+    /** Currently selected flag color (persisted across themes). */
+    var flagColor: Int = -1
+        private set
+
     private var initialized = false
     private var startedAtMs = 0L
     private var finishedAtMs = 0L
@@ -37,6 +46,7 @@ class GameViewModel : ViewModel() {
         startedAtMs = 0L
         finishedAtMs = 0L
         resultShown = false
+        isAssisted = false
     }
 
     /** Must be called after every change of the board to keep the timer in sync. */
@@ -56,5 +66,20 @@ class GameViewModel : ViewModel() {
             finishedAtMs != 0L -> ((finishedAtMs - startedAtMs) / 1000).toInt()
             else -> ((SystemClock.elapsedRealtime() - startedAtMs) / 1000).toInt()
         }
+    }
+
+    /** Load saved flag color preference. Returns -1 if none set. */
+    fun loadFlagColor(prefs: SharedPreferences): Int {
+        return prefs.getInt(KEY_FLAG_COLOR, -1)
+    }
+
+    /** Save flag color preference. */
+    fun saveFlagColor(prefs: SharedPreferences, color: Int) {
+        flagColor = color
+        prefs.edit().putInt(KEY_FLAG_COLOR, color).apply()
+    }
+
+    private companion object {
+        const val KEY_FLAG_COLOR = "flag_color"
     }
 }

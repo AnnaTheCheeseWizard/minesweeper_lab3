@@ -5,11 +5,33 @@
     <!-- Menu -->
     <string name="menu_new_game">Нова гра</string>
     <string name="menu_difficulty">Складність</string>
+    <string name="menu_theme">Тема</string>
     <string name="menu_language">Мова</string>
+    <string name="menu_flag_color">Колір прапорця</string>
+
+    <string name="theme_lilies">Лілія в ставку</string>
+    <string name="theme_plum_olive">Слива та Олива</string>
+    <string name="theme_cotton_candy">Цукрова вата</string>
+    <string name="theme_silk_touch">Шовковий дотик</string>
+    <string name="theme_lavender_mint">Лаванда та М’ята</string>
+
+    <!-- Flag colors -->
+    <string name="flag_color_blue">Синій</string>
+    <string name="flag_color_red">Червоний</string>
+    <string name="flag_color_green">Зелений</string>
+    <string name="flag_color_yellow">Жовтий</string>
+    <string name="flag_color_pink">Рожевий</string>
+    <string name="flag_color_white">Білий</string>
+    <string name="flag_color_black">Чорний</string>
+    <string name="flag_color_default">За замовчуванням</string>
 
     <!-- Status bar -->
     <string name="label_mines">Міни: %1$03d</string>
     <string name="label_time">Час: %1$03d</string>
+    <string name="label_best">Рекорд: %1$s</string>
+    <string name="label_best_none">--</string>
+    <string name="btn_difficulty">Складність</string>
+    <string name="difficulty_button_format">%1$s ▾</string>
     <string name="btn_restart">Заново</string>
     <string name="board_description">Ігрове поле сапера</string>
 
@@ -41,7 +63,7 @@
     <string name="language_system">Мова системи</string>
 
     <!-- Hints and solver messages -->
-    <string name="hint_default">Дотик — відкрити клітинку, довге натискання — прапорець, дотик по числу — відкрити сусідні.</string>
+    <string name="hint_default">Один дотик — прапорець, подвійний дотик — відкрити клітинку.</string>
     <string name="hint_none">Для цієї позиції алгоритм не знайшов ходу.</string>
     <plurals name="hint_moves_found">
         <item quantity="one">Знайдено %d певний хід</item>
@@ -66,6 +88,7 @@
 
     <!-- Game result dialog -->
     <string name="result_won_title">Перемога!</string>
+    <string name="result_new_record">Новий рекорд! Час: %1$s</string>
     <string name="result_lost_title">Бум! Гру завершено</string>
     <string name="result_message">Час: %1$s</string>
     <string name="dialog_new_game">Нова гра</string>

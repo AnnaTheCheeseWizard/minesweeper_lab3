@@ -11,7 +11,7 @@
 | Kotlin/Java | Kotlin 2.0, Android Views (без Compose) |
 | Віддалений репозиторій, логічні коміти, `.gitignore` | Історія в `git log`; `.gitignore` виключає `build/`, `.gradle/`, `local.properties`, `.idea/`, ключі підпису, `*.apk` тощо |
 | Логування через правильно налаштований Logger | **Timber** (`util/AppLogger.kt`): у debug — усі повідомлення з тегом `Клас:рядок`; у release — лише WARN/ERROR зі stack trace |
-| i18n | English (за замовчуванням), Українська, Polski; `plurals` (укр./пол. мають форми one/few/many/other), форматні рядки з позиційними аргументами; **перемикання мови всередині застосунку** (`AppCompatDelegate.setApplicationLocales`) + `locales_config.xml` для системних налаштувань «Мова застосунку» (Android 13+) |
+| i18n | English (за замовчуванням), Українська, עברית (іврит, RTL); `plurals` (укр. має форми one/few/many/other, іврит — one/two/other), форматні рядки з позиційними аргументами; **перемикання мови всередині застосунку** (`AppCompatDelegate.setApplicationLocales`) + `locales_config.xml` для системних налаштувань «Мова застосунку» (Android 13+) |
 
 ## Структура проєкту
 
@@ -23,7 +23,7 @@ app/src/main/java/com/example/minesweeper/
 ├── util/      AppLogger (Timber), LanguageManager      – логування та мови
 ├── GameViewModel.kt, MainActivity.kt, MinesweeperApp.kt
 app/src/test/  BoardTest, MinesweeperSolverTest         – юніт-тести JUnit4
-app/src/main/res/values{,-uk,-pl}/strings.xml           – локалізація
+app/src/main/res/values{,-uk,-iw}/strings.xml           – локалізація
 ```
 
 ## Як грати
@@ -88,11 +88,13 @@ Timber.w("Solver: component of %d cells exceeded the node budget", n)
 
 ## Інтернаціоналізація
 
-* `values/strings.xml` — English (за замовчуванням), `values-uk`, `values-pl`.
+* `values/strings.xml` — English (за замовчуванням), `values-uk`, `values-iw` (іврит; папка `iw` — застарілий код мови, який вимагає Android lint).
 * Усі тексти UI — у ресурсах; числа вставляються через форматні рядки (`%1$d`), множина — через `plurals`.
-* Назви мов (`English`, `Українська`, `Polski`) не перекладаються, щоб користувач завжди міг їх знайти.
+* Назви мов (`English`, `Українська`, `עברית`) не перекладаються, щоб користувач завжди міг їх знайти.
 * Вибір мови: меню ⋮ → *Мова*. Збереження вибору забезпечує AppCompat
   (`AppLocalesMetadataHolderService` у маніфесті для Android ≤ 12, системні налаштування для Android 13+).
+* Іврит — мова з письмом справа наліво: `android:supportsRtl="true"` у маніфесті віддзеркалює інтерфейс автоматично
+  (рядок стану, кнопки), а саме поле гри малюється однаково в усіх мовах. У `locales_config.xml` і `LanguageManager` використовується тег `he`.
 * Щоб додати мову: створити `values-xx/strings.xml`, додати `<locale>` у `xml/locales_config.xml`
   та пункт у `LanguageManager.options`.
 

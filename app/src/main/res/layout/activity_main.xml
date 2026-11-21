@@ -5,100 +5,239 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
+    android:background="@color/surface"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:title="@string/app_name" />
+        android:layout_height="44dp"
+        android:background="@color/surface"
+        app:title="@string/app_name"
+        app:titleTextColor="#FFFFFF" />
 
+    <!-- Compact Row 1: Best Time & Dedicated Difficulty Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="4dp">
+        android:paddingHorizontal="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
 
-        <TextView
-            android:id="@+id/minesText"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bestTimeCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            tools:text="Mines: 010" />
+            app:cardBackgroundColor="#E1788B"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E59EAB"
+            app:strokeWidth="1dp">
 
-        <Button
-            android:id="@+id/restartButton"
-            style="@style/Widget.Material3.Button.TonalButton"
+            <TextView
+                android:id="@+id/bestTimeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="4dp"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                tools:text="Best: 015s" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/difficultyButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_restart" />
-
-        <TextView
-            android:id="@+id/timerText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            tools:text="Time: 000" />
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:text="@string/btn_difficulty"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#E1788B"
+            app:cornerRadius="10dp" />
     </LinearLayout>
 
-    <com.example.minesweeper.ui.BoardView
-        android:id="@+id/boardView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:contentDescription="@string/board_description" />
-
-    <TextView
-        android:id="@+id/hintText"
+    <!-- Compact Row 2: Mines Count, Restart Button, Current Timer -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minLines="3"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:text="@string/hint_default"
-        android:textAppearance="?attr/textAppearanceBodyMedium" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp">
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/minesCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#E1788B"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E59EAB"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/minesText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="4dp"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                tools:text="Mines: 010" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/restartButton"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginHorizontal="6dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="12dp"
+            android:text="@string/btn_restart"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#E59EAB"
+            app:cornerRadius="10dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/timerCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#E1788B"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E59EAB"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/timerText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="4dp"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                tools:text="Time: 000" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- Maximized Board View Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/boardCard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="6dp"
+        android:layout_marginVertical="2dp"
+        android:layout_weight="1"
+        app:cardBackgroundColor="#388E2A"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:strokeColor="#7EBF50"
+        app:strokeWidth="1.5dp">
+
+        <com.example.minesweeper.ui.BoardView
+            android:id="@+id/boardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/board_description" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Compact Hint Text Section -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/hintCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="6dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
+        app:cardBackgroundColor="#7EBF50"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#98CE71"
+        app:strokeWidth="1dp">
+
+        <TextView
+            android:id="@+id/hintText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="1"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="@string/hint_default"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="#FFFFFF" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Compact Bottom Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingBottom="8dp">
+        android:paddingHorizontal="4dp"
+        android:paddingBottom="6dp">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/hintButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
+            android:layout_height="36dp"
+            android:layout_marginHorizontal="3dp"
             android:layout_weight="1"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:maxLines="1"
-            android:text="@string/btn_hint" />
+            android:text="@string/btn_hint"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#E59EAB"
+            app:cornerRadius="10dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/stepButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
+            android:layout_height="36dp"
+            android:layout_marginHorizontal="3dp"
             android:layout_weight="1"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:maxLines="1"
-            android:text="@string/btn_step" />
+            android:text="@string/btn_step"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#E59EAB"
+            app:cornerRadius="10dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/autoButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
+            android:layout_height="36dp"
+            android:layout_marginHorizontal="3dp"
             android:layout_weight="1"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:maxLines="1"
-            android:text="@string/btn_auto" />
+            android:text="@string/btn_auto"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#E1788B"
+            app:cornerRadius="10dp" />
     </LinearLayout>
 </LinearLayout>

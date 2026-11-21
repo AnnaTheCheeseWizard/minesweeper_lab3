@@ -1,8 +1,8 @@
 package com.example.minesweeper.game
 
-/** Standard Minesweeper difficulty presets. */
+/** Minesweeper difficulty presets optimized with square cells for portrait mobile screens. */
 enum class Difficulty(val rows: Int, val cols: Int, val mines: Int) {
-    BEGINNER(9, 9, 10),
-    INTERMEDIATE(16, 16, 40),
-    EXPERT(30, 16, 99),
+    BEGINNER(14, 6, 10),
+    INTERMEDIATE(20, 9, 30),
+    EXPERT(26, 12, 60),
 }
