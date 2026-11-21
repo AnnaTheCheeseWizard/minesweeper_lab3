@@ -1,8 +1,6 @@
 package com.example.minesweeper
 
-import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -19,17 +17,19 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.minesweeper.game.CellState
 import com.example.minesweeper.game.Difficulty
 import com.example.minesweeper.game.GameStatus
+import com.example.minesweeper.solver.MinesweeperSolver
 import com.example.minesweeper.solver.Move
 import com.example.minesweeper.solver.MoveAction
 import com.example.minesweeper.solver.MoveReason
-import com.example.minesweeper.solver.MinesweeperSolver
 import com.example.minesweeper.ui.BoardTheme
 import com.example.minesweeper.ui.BoardView
 import com.example.minesweeper.ui.FlagColorInfo
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         applyBoardTheme(activeTheme)
 
         // Load and apply saved flag color
-        val savedFlagColor = viewModel.loadFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE))
+        val savedFlagColor = viewModel.loadFlagColor(getSharedPreferences(PREFS, MODE_PRIVATE))
         boardView.customFlagColor = savedFlagColor
 
         viewModel.initIfNeeded(loadDifficulty())
@@ -248,13 +248,13 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         val currentFlagColor = viewModel.flagColor
         val flagColors = listOf(
             FlagColorInfo(R.string.flag_color_default, -1, true),
-            FlagColorInfo(R.string.flag_color_blue, Color.parseColor("#2196F3")),
-            FlagColorInfo(R.string.flag_color_red, Color.parseColor("#F44336")),
-            FlagColorInfo(R.string.flag_color_green, Color.parseColor("#4CAF50")),
-            FlagColorInfo(R.string.flag_color_yellow, Color.parseColor("#FFEB3B")),
-            FlagColorInfo(R.string.flag_color_pink, Color.parseColor("#E91E63")),
-            FlagColorInfo(R.string.flag_color_white, Color.parseColor("#FFFFFF")),
-            FlagColorInfo(R.string.flag_color_black, Color.parseColor("#212121")),
+            FlagColorInfo(R.string.flag_color_blue, "#2196F3".toColorInt()),
+            FlagColorInfo(R.string.flag_color_red, "#F44336".toColorInt()),
+            FlagColorInfo(R.string.flag_color_green, "#4CAF50".toColorInt()),
+            FlagColorInfo(R.string.flag_color_yellow, "#FFEB3B".toColorInt()),
+            FlagColorInfo(R.string.flag_color_pink, "#E91E63".toColorInt()),
+            FlagColorInfo(R.string.flag_color_white, "#FFFFFF".toColorInt()),
+            FlagColorInfo(R.string.flag_color_black, "#212121".toColorInt()),
         )
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_flag_picker, null)
@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
         gridView.setOnItemClickListener { _, _, position, _ ->
             val selected = flagColors[position]
-            viewModel.saveFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE), selected.color)
+            viewModel.saveFlagColor(getSharedPreferences(PREFS, MODE_PRIVATE), selected.color)
             boardView.customFlagColor = selected.color
             updateStatusTexts()
             dialog.dismiss()
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
     }
 
     private fun showDifficultyDialog() {
-        val values = Difficulty.values()
+        val values = Difficulty.entries.toTypedArray()
         val labels = values.map { difficultyLabel(it) }.toTypedArray()
         val activeTheme = loadTheme()
         val adapter = createThemedSingleChoiceAdapter(labels, activeTheme)
@@ -446,17 +446,17 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
             return false
         }
 
-        for (move in moves.filter { it.action == MoveAction.FLAG }) {
-            if (board.stateAt(move.row, move.col) == CellState.HIDDEN) {
-                board.toggleFlag(move.row, move.col)
+        for ((row, col) in moves.filter { it.action == MoveAction.FLAG }) {
+            if (board.stateAt(row, col) == CellState.HIDDEN) {
+                board.toggleFlag(row, col)
             }
         }
-        for (move in moves.filter { it.action == MoveAction.REVEAL }) {
-            if (board.stateAt(move.row, move.col) == CellState.FLAGGED) {
+        for ((row, col) in moves.filter { it.action == MoveAction.REVEAL }) {
+            if (board.stateAt(row, col) == CellState.FLAGGED) {
                 // The player's flag was wrong: the solver proved the cell is safe.
-                board.toggleFlag(move.row, move.col)
+                board.toggleFlag(row, col)
             }
-            board.reveal(move.row, move.col)
+            board.reveal(row, col)
         }
         Timber.i("Solver applied %d moves (first reason: %s)", moves.size, moves[0].reason)
 
@@ -591,41 +591,41 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
     // ---------------------------------------------------------------- persistence
 
     private fun loadTheme(): BoardTheme {
-        val id = getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_THEME, null)
+        val id = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_THEME, null)
         return BoardTheme.fromId(id)
     }
 
     private fun saveTheme(theme: BoardTheme) {
-        getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_THEME, theme.id)
-            .apply()
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+            .edit {
+                putString(KEY_THEME, theme.id)
+            }
     }
 
     private fun loadDifficulty(): Difficulty {
-        val name = getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_DIFFICULTY, null)
-        return Difficulty.values().firstOrNull { it.name == name } ?: Difficulty.BEGINNER
+        val name = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_DIFFICULTY, null)
+        return Difficulty.entries.firstOrNull { it.name == name } ?: Difficulty.BEGINNER
     }
 
     private fun saveDifficulty(difficulty: Difficulty) {
-        getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_DIFFICULTY, difficulty.name)
-            .apply()
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+            .edit {
+                putString(KEY_DIFFICULTY, difficulty.name)
+            }
     }
 
     private fun getBestTime(difficulty: Difficulty): Int {
-        return getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return getSharedPreferences(PREFS, MODE_PRIVATE)
             .getInt(KEY_BEST_TIME_PREFIX + difficulty.name, -1)
     }
 
     private fun saveBestTimeIfNeeded(difficulty: Difficulty, seconds: Int): Boolean {
         val currentBest = getBestTime(difficulty)
         if (currentBest == -1 || seconds < currentBest) {
-            getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .edit()
-                .putInt(KEY_BEST_TIME_PREFIX + difficulty.name, seconds)
-                .apply()
+            getSharedPreferences(PREFS, MODE_PRIVATE)
+                .edit {
+                    putInt(KEY_BEST_TIME_PREFIX + difficulty.name, seconds)
+                }
             return true
         }
         return false
