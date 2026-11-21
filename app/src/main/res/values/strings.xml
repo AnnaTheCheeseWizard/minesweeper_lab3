@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Minesweeper</string>
+
+    <!-- Menu -->
+    <string name="menu_new_game">New game</string>
+    <string name="menu_difficulty">Difficulty</string>
+    <string name="menu_language">Language</string>
+
+    <!-- Status bar -->
+    <string name="label_mines">Mines: %1$03d</string>
+    <string name="label_time">Time: %1$03d</string>
+    <string name="btn_restart">Restart</string>
+    <string name="board_description">Minesweeper board</string>
+
+    <!-- Solver buttons -->
+    <string name="btn_hint">Hint</string>
+    <string name="btn_step">Solve step</string>
+    <string name="btn_auto">Auto-solve</string>
+    <string name="btn_stop">Stop</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_beginner">Beginner</string>
+    <string name="difficulty_intermediate">Intermediate</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_item">%1$s: %2$d×%3$d, %4$s</string>
+
+    <plurals name="mines_count">
+        <item quantity="one">%d mine</item>
+        <item quantity="other">%d mines</item>
+    </plurals>
+    <plurals name="seconds_count">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <!-- Language names are shown in their own language and are not translated -->
+    <string name="language_system">System default</string>
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_uk" translatable="false">Українська</string>
+    <string name="language_pl" translatable="false">Polski</string>
+
+    <!-- Hints and solver messages -->
+    <string name="hint_default">Tap to reveal, long-press to flag, tap a number to chord.</string>
+    <string name="hint_none">The solver has no move for this position.</string>
+    <plurals name="hint_moves_found">
+        <item quantity="one">%d certain move found</item>
+        <item quantity="other">%d certain moves found</item>
+    </plurals>
+    <string name="hint_certain_format">%1$s (%2$s)</string>
+    <string name="hint_guess">No certain moves. Best guess: row %1$d, column %2$d (%3$d%% chance of a mine).</string>
+    <plurals name="solver_applied">
+        <item quantity="one">Solver made %d move</item>
+        <item quantity="other">Solver made %d moves</item>
+    </plurals>
+    <string name="solver_guess">Solver guessed: row %1$d, column %2$d (%3$d%% chance of a mine).</string>
+
+    <string name="reason_first_move">first move: the centre of an untouched board</string>
+    <string name="reason_simple">simple rule: a number fits its hidden neighbours exactly</string>
+    <string name="reason_subset">comparison of two overlapping numbers</string>
+    <string name="reason_exact">exhaustive search of all mine layouts</string>
+
+    <!-- Game result dialog -->
+    <string name="result_won_title">You won!</string>
+    <string name="result_lost_title">Boom! Game over</string>
+    <string name="result_message">Time: %1$s</string>
+    <string name="dialog_new_game">New game</string>
+    <string name="dialog_close">Close</string>
+</resources>

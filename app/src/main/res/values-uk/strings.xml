@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сапер</string>
+
+    <!-- Menu -->
+    <string name="menu_new_game">Нова гра</string>
+    <string name="menu_difficulty">Складність</string>
+    <string name="menu_language">Мова</string>
+
+    <!-- Status bar -->
+    <string name="label_mines">Міни: %1$03d</string>
+    <string name="label_time">Час: %1$03d</string>
+    <string name="btn_restart">Заново</string>
+    <string name="board_description">Ігрове поле сапера</string>
+
+    <!-- Solver buttons -->
+    <string name="btn_hint">Підказка</string>
+    <string name="btn_step">Крок</string>
+    <string name="btn_auto">Авто</string>
+    <string name="btn_stop">Стоп</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_beginner">Новачок</string>
+    <string name="difficulty_intermediate">Середній</string>
+    <string name="difficulty_expert">Експерт</string>
+    <string name="difficulty_item">%1$s: %2$d×%3$d, %4$s</string>
+
+    <plurals name="mines_count">
+        <item quantity="one">%d міна</item>
+        <item quantity="few">%d міни</item>
+        <item quantity="many">%d мін</item>
+        <item quantity="other">%d мін</item>
+    </plurals>
+    <plurals name="seconds_count">
+        <item quantity="one">%d секунда</item>
+        <item quantity="few">%d секунди</item>
+        <item quantity="many">%d секунд</item>
+        <item quantity="other">%d секунд</item>
+    </plurals>
+
+    <string name="language_system">Мова системи</string>
+
+    <!-- Hints and solver messages -->
+    <string name="hint_default">Дотик — відкрити клітинку, довге натискання — прапорець, дотик по числу — відкрити сусідні.</string>
+    <string name="hint_none">Для цієї позиції алгоритм не знайшов ходу.</string>
+    <plurals name="hint_moves_found">
+        <item quantity="one">Знайдено %d певний хід</item>
+        <item quantity="few">Знайдено %d певні ходи</item>
+        <item quantity="many">Знайдено %d певних ходів</item>
+        <item quantity="other">Знайдено %d певного ходу</item>
+    </plurals>
+    <string name="hint_certain_format">%1$s (%2$s)</string>
+    <string name="hint_guess">Певних ходів немає. Найкращий здогад: рядок %1$d, стовпець %2$d (ймовірність міни %3$d%%).</string>
+    <plurals name="solver_applied">
+        <item quantity="one">Алгоритм зробив %d хід</item>
+        <item quantity="few">Алгоритм зробив %d ходи</item>
+        <item quantity="many">Алгоритм зробив %d ходів</item>
+        <item quantity="other">Алгоритм зробив %d ходу</item>
+    </plurals>
+    <string name="solver_guess">Алгоритм ризикнув: рядок %1$d, стовпець %2$d (ймовірність міни %3$d%%).</string>
+
+    <string name="reason_first_move">перший хід: центр порожнього поля</string>
+    <string name="reason_simple">просте правило: число точно відповідає прихованим сусідам</string>
+    <string name="reason_subset">порівняння двох сусідніх чисел</string>
+    <string name="reason_exact">повний перебір усіх розташувань мін</string>
+
+    <!-- Game result dialog -->
+    <string name="result_won_title">Перемога!</string>
+    <string name="result_lost_title">Бум! Гру завершено</string>
+    <string name="result_message">Час: %1$s</string>
+    <string name="dialog_new_game">Нова гра</string>
+    <string name="dialog_close">Закрити</string>
+</resources>
