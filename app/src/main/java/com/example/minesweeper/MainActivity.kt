@@ -32,8 +32,8 @@ import com.example.minesweeper.solver.MoveReason
 import com.example.minesweeper.solver.MinesweeperSolver
 import com.example.minesweeper.ui.BoardTheme
 import com.example.minesweeper.ui.BoardView
-import com.example.minesweeper.ui.FlagColorChoiceAdapter
 import com.example.minesweeper.ui.FlagColorInfo
+import com.example.minesweeper.ui.FlagGridAdapter
 import com.example.minesweeper.ui.ThemeChoiceAdapter
 import com.example.minesweeper.util.LanguageManager
 import com.google.android.material.appbar.MaterialToolbar
@@ -256,24 +256,42 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
             FlagColorInfo(R.string.flag_color_white, Color.parseColor("#FFFFFF")),
             FlagColorInfo(R.string.flag_color_black, Color.parseColor("#212121")),
         )
-        val selectedIndex = flagColors.indexOfFirst { fc ->
-            if (fc.isDefault) currentFlagColor == -1 else fc.color == currentFlagColor
-        }
-        val adapter = FlagColorChoiceAdapter(flagColors, currentFlagColor, activeTheme.primaryCardText)
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_flag_picker, null)
+        val gridView = dialogView.findViewById<android.widget.GridView>(R.id.flagGridView)
+        val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        titleView.setTextColor(activeTheme.primaryCardText)
+
+        val adapter = FlagGridAdapter(this, flagColors, currentFlagColor, activeTheme.primaryCardText, activeTheme.surfaceColor)
+        gridView.adapter = adapter
+
         val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.menu_flag_color)
-            .setSingleChoiceItems(adapter, selectedIndex) { dialogInterface, which ->
-                val selected = flagColors[which]
-                viewModel.saveFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE), selected.color)
-                boardView.customFlagColor = selected.color
-                updateStatusTexts()
-                dialogInterface.dismiss()
-            }
+            .setView(dialogView)
             .setNegativeButton(R.string.dialog_close, null)
             .create()
 
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            val selected = flagColors[position]
+            viewModel.saveFlagColor(getSharedPreferences(PREFS, Context.MODE_PRIVATE), selected.color)
+            boardView.customFlagColor = selected.color
+            updateStatusTexts()
+            dialog.dismiss()
+        }
+
         dialog.show()
-        styleDialog(dialog, activeTheme)
+
+        val drawable = GradientDrawable().apply {
+            setColor(activeTheme.surfaceColor)
+            setStroke(dpToPx(2), activeTheme.secondaryCardColor)
+            cornerRadius = dpToPx(16).toFloat()
+        }
+        dialog.window?.setBackgroundDrawable(drawable)
+
+        val negativeBtn = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+        if (negativeBtn != null) {
+            negativeBtn.setTextColor(activeTheme.secondaryCardText)
+            (negativeBtn as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(activeTheme.secondaryCardColor)
+        }
     }
 
     private fun applySystemBarIcons(theme: BoardTheme) {
