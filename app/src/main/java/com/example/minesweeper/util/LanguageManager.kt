@@ -25,7 +25,7 @@ object LanguageManager {
     /** Index in [options] of the language currently selected by the user. */
     fun currentIndex(): Int {
         val locales = AppCompatDelegate.getApplicationLocales()
-        if (locales.isEmpty) return 0
+        if (locales.size() == 0) return 0
         val language = locales[0]?.language ?: return 0
         val index = options.indexOfFirst { it.tag == language }
         return if (index >= 0) index else 0
