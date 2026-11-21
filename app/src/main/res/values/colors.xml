@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="board_background">#FF9E9E9E</color>
+    <color name="cell_hidden">#FFCFD8DC</color>
+    <color name="cell_hidden_edge">#FFFFFFFF</color>
+    <color name="cell_hidden_shadow">#FF78909C</color>
+    <color name="cell_revealed">#FFECEFF1</color>
+    <color name="cell_exploded">#FFEF5350</color>
+    <color name="mine">#FF212121</color>
+    <color name="flag">#FFD32F2F</color>
+    <color name="hint_safe">#FF2E7D32</color>
+    <color name="hint_mine">#FFC62828</color>
+    <color name="hint_guess">#FFF9A825</color>
+
+    <color name="number_1">#FF1565C0</color>
+    <color name="number_2">#FF2E7D32</color>
+    <color name="number_3">#FFD32F2F</color>
+    <color name="number_4">#FF4A148C</color>
+    <color name="number_5">#FF8D1D12</color>
+    <color name="number_6">#FF00838F</color>
+    <color name="number_7">#FF000000</color>
+    <color name="number_8">#FF616161</color>
+
+    <color name="ic_launcher_background">#FF2E7D32</color>
+</resources>

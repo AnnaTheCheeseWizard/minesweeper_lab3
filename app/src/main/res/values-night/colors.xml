@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="board_background">#FF37474F</color>
+    <color name="cell_hidden">#FF607D8B</color>
+    <color name="cell_hidden_edge">#FF90A4AE</color>
+    <color name="cell_hidden_shadow">#FF37474F</color>
+    <color name="cell_revealed">#FF263238</color>
+    <color name="mine">#FFECEFF1</color>
+    <color name="number_1">#FF64B5F6</color>
+    <color name="number_2">#FF81C784</color>
+    <color name="number_3">#FFE57373</color>
+    <color name="number_4">#FFBA68C8</color>
+    <color name="number_5">#FFFF8A65</color>
+    <color name="number_6">#FF4DD0E1</color>
+    <color name="number_7">#FFFFFFFF</color>
+    <color name="number_8">#FFB0BEC5</color>
+</resources>
