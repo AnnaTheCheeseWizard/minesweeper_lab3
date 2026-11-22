@@ -6,8 +6,8 @@
     <string name="menu_new_game">New game</string>
     <string name="menu_difficulty">Difficulty</string>
     <string name="menu_theme">Theme</string>
+    <string name="menu_flags">Flags</string>
     <string name="menu_language">Language</string>
-    <string name="menu_flag_color">Flag color</string>
 
     <string name="theme_lilies">Pond of Lilies</string>
     <string name="theme_plum_olive">Plum &amp; Olive</string>
@@ -23,7 +23,6 @@
     <string name="flag_color_pink">Pink</string>
     <string name="flag_color_white">White</string>
     <string name="flag_color_black">Black</string>
-    <string name="flag_color_default">Default</string>
 
     <!-- Status bar -->
     <string name="label_mines">Mines: %1$03d</string>

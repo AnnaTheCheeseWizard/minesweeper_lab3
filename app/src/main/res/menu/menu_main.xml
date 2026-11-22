@@ -6,8 +6,8 @@
         android:title="@string/menu_theme"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_flag_color"
-        android:title="@string/menu_flag_color"
+        android:id="@+id/action_flags"
+        android:title="@string/menu_flags"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_language"

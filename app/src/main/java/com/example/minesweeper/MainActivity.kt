@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
                 showThemeDialog()
                 true
             }
-            R.id.action_flag_color -> {
+            R.id.action_flags -> {
                 showFlagColorDialog()
                 true
             }
@@ -245,9 +245,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
     /** Keeps status/navigation bar icons readable on both light and dark themes. */
     private fun showFlagColorDialog() {
         val activeTheme = loadTheme()
-        val currentFlagColor = viewModel.flagColor
         val flagColors = listOf(
-            FlagColorInfo(R.string.flag_color_default, -1, true),
             FlagColorInfo(R.string.flag_color_blue, "#2196F3".toColorInt()),
             FlagColorInfo(R.string.flag_color_red, "#F44336".toColorInt()),
             FlagColorInfo(R.string.flag_color_green, "#4CAF50".toColorInt()),
@@ -256,10 +254,12 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
             FlagColorInfo(R.string.flag_color_white, "#FFFFFF".toColorInt()),
             FlagColorInfo(R.string.flag_color_black, "#212121".toColorInt()),
         )
+        val currentFlagColor = if (viewModel.flagColor != -1) viewModel.flagColor else flagColors[0].color
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_flag_picker, null)
         val gridView = dialogView.findViewById<android.widget.GridView>(R.id.flagGridView)
         val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        titleView.setText(R.string.menu_flags)
         titleView.setTextColor(activeTheme.primaryCardText)
 
         val adapter = FlagGridAdapter(this, flagColors, currentFlagColor, activeTheme.primaryCardText, activeTheme.surfaceColor)

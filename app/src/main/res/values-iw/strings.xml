@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">שולה המוקשים</string>
+
+    <!-- Menu -->
+    <string name="menu_new_game">משחק חדש</string>
+    <string name="menu_difficulty">רמת קושי</string>
+    <string name="menu_theme">ערכת נושא</string>
+    <string name="menu_flags">דגלים</string>
+    <string name="menu_language">שפה</string>
+
+    <string name="theme_lilies">שושנת מים</string>
+    <string name="theme_plum_olive">שזיף וזית</string>
+    <string name="theme_cotton_candy">צמר גפן מתוק</string>
+    <string name="theme_silk_touch">מגע משי</string>
+    <string name="theme_lavender_mint">לבנדר ונענע</string>
+
+    <!-- Flag colors -->
+    <string name="flag_color_blue">כחול</string>
+    <string name="flag_color_red">אדום</string>
+    <string name="flag_color_green">ירוק</string>
+    <string name="flag_color_yellow">צהוב</string>
+    <string name="flag_color_pink">ורוד</string>
+    <string name="flag_color_white">לבן</string>
+    <string name="flag_color_black">שחור</string>
+
+    <!-- Status bar -->
+    <string name="label_mines">מוקשים: %1$03d</string>
+    <string name="label_time">זמן: %1$03d</string>
+    <string name="label_best">שיא: %1$s</string>
+    <string name="label_best_none">--</string>
+    <string name="btn_difficulty">רמת קושי</string>
+    <string name="difficulty_button_format">%1$s ▾</string>
+    <string name="btn_restart">התחל מחדש</string>
+    <string name="board_description">לוח שולה המוקשים</string>
+
+    <!-- Solver buttons -->
+    <string name="btn_hint">רמז</string>
+    <string name="btn_step">צעד</string>
+    <string name="btn_auto">אוטומטי</string>
+    <string name="btn_stop">עצור</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_beginner">מתחיל</string>
+    <string name="difficulty_intermediate">בינוני</string>
+    <string name="difficulty_expert">מומחה</string>
+    <string name="difficulty_item">%1$s: %2$d×%3$d, %4$s</string>
+
+    <!-- Hebrew plural categories: one / two / other (older Android versions also use "many") -->
+    <plurals name="mines_count">
+        <item quantity="one">מוקש אחד</item>
+        <item quantity="two">שני מוקשים</item>
+        <item quantity="many">%d מוקשים</item>
+        <item quantity="other">%d מוקשים</item>
+    </plurals>
+    <plurals name="seconds_count">
+        <item quantity="one">שנייה אחת</item>
+        <item quantity="two">שתי שניות</item>
+        <item quantity="many">%d שניות</item>
+        <item quantity="other">%d שניות</item>
+    </plurals>
+
+    <string name="language_system">שפת המערכת</string>
+
+    <!-- Hints and solver messages -->
+    <string name="hint_default">הקשה — חשיפת משבצת, לחיצה ארוכה — סימון דגל, הקשה על מספר — חשיפת המשבצות הסמוכות.</string>
+    <string name="hint_none">האלגוריתם לא מצא מהלך למצב הזה.</string>
+    <plurals name="hint_moves_found">
+        <item quantity="one">נמצא מהלך ודאי אחד</item>
+        <item quantity="two">נמצאו שני מהלכים ודאיים</item>
+        <item quantity="many">נמצאו %d מהלכים ודאיים</item>
+        <item quantity="other">נמצאו %d מהלכים ודאיים</item>
+    </plurals>
+    <string name="hint_certain_format">%1$s (%2$s)</string>
+    <string name="hint_guess">אין מהלכים ודאיים. הניחוש הטוב ביותר: שורה %1$d, עמודה %2$d (סיכוי של %3$d%% למוקש).</string>
+    <plurals name="solver_applied">
+        <item quantity="one">האלגוריתם ביצע מהלך אחד</item>
+        <item quantity="two">האלגוריתם ביצע שני מהלכים</item>
+        <item quantity="many">האלגוריתם ביצע %d מהלכים</item>
+        <item quantity="other">האלגוריתם ביצע %d מהלכים</item>
+    </plurals>
+    <string name="solver_guess">האלגוריתם לקח סיכון: שורה %1$d, עמודה %2$d (סיכוי של %3$d%% למוקש).</string>
+
+    <string name="reason_first_move">מהלך ראשון: מרכז הלוח הריק</string>
+    <string name="reason_simple">כלל פשוט: המספר תואם בדיוק את השכנים הסמויים</string>
+    <string name="reason_subset">השוואה בין שני מספרים סמוכים</string>
+    <string name="reason_exact">מעבר מלא על כל פיזורי המוקשים האפשריים</string>
+
+    <!-- Game result dialog -->
+    <string name="result_won_title">ניצחון!</string>
+    <string name="result_new_record">שיא חדש! זמן: %1$s</string>
+    <string name="result_lost_title">בום! המשחק נגמר</string>
+    <string name="result_message">זמן: %1$s</string>
+    <string name="dialog_new_game">משחק חדש</string>
+    <string name="dialog_close">סגור</string>
+</resources>

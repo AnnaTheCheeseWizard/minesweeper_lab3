@@ -6,8 +6,8 @@
     <string name="menu_new_game">Нова гра</string>
     <string name="menu_difficulty">Складність</string>
     <string name="menu_theme">Тема</string>
+    <string name="menu_flags">Прапорці</string>
     <string name="menu_language">Мова</string>
-    <string name="menu_flag_color">Колір прапорця</string>
 
     <string name="theme_lilies">Лілія в ставку</string>
     <string name="theme_plum_olive">Слива та Олива</string>
@@ -23,7 +23,6 @@
     <string name="flag_color_pink">Рожевий</string>
     <string name="flag_color_white">Білий</string>
     <string name="flag_color_black">Чорний</string>
-    <string name="flag_color_default">За замовчуванням</string>
 
     <!-- Status bar -->
     <string name="label_mines">Міни: %1$03d</string>
