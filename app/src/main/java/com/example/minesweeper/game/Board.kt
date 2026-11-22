@@ -28,6 +28,7 @@ class Board(
     }
 
     private val size = rows * cols
+    private val neighbors = neighborTable(rows, cols)
     private val mines = BooleanArray(size)
     private val adjacent = IntArray(size)
     private val states = Array(size) { CellState.HIDDEN }
@@ -116,12 +117,12 @@ class Board(
         val i = index(row, col)
         if (states[i] != CellState.REVEALED || adjacent[i] == 0) return false
 
-        val neighbors = neighborIndices(i, rows, cols)
-        val flags = neighbors.count { states[it] == CellState.FLAGGED }
+        val around = neighbors[i]
+        val flags = around.count { states[it] == CellState.FLAGGED }
         if (flags != adjacent[i]) return false
 
         var changed = false
-        for (n in neighbors) {
+        for (n in around) {
             if (states[n] == CellState.HIDDEN && reveal(n / cols, n % cols)) {
                 changed = true
             }
@@ -142,16 +143,19 @@ class Board(
     }
 
     private fun floodReveal(start: Int) {
-        val stack = ArrayDeque<Int>()
-        stack.addLast(start)
-        while (stack.isNotEmpty()) {
-            val current = stack.removeLast()
-            if (states[current] != CellState.HIDDEN) continue
-            states[current] = CellState.REVEALED
-            revealedCount++
-            if (adjacent[current] == 0) {
-                for (n in neighborIndices(current, rows, cols)) {
-                    if (states[n] == CellState.HIDDEN) stack.addLast(n)
+        val stack = IntArray(size)
+        var top = 0
+        states[start] = CellState.REVEALED
+        revealedCount++
+        stack[top++] = start
+        while (top > 0) {
+            val current = stack[--top]
+            if (adjacent[current] != 0) continue
+            for (n in neighbors[current]) {
+                if (states[n] == CellState.HIDDEN) {
+                    states[n] = CellState.REVEALED
+                    revealedCount++
+                    stack[top++] = n
                 }
             }
         }
@@ -171,7 +175,7 @@ class Board(
     private fun placeMines(firstIndex: Int) {
         val excluded = HashSet<Int>()
         excluded.add(firstIndex)
-        for (n in neighborIndices(firstIndex, rows, cols)) excluded.add(n)
+        for (n in neighbors[firstIndex]) excluded.add(n)
         // On tiny boards there may be no room for a full safe zone.
         if (size - excluded.size < mineCount) {
             excluded.clear()
@@ -185,7 +189,9 @@ class Board(
 
     private fun computeAdjacency() {
         for (i in 0 until size) {
-            adjacent[i] = neighborIndices(i, rows, cols).count { mines[it] }
+            var count = 0
+            for (n in neighbors[i]) if (mines[n]) count++
+            adjacent[i] = count
         }
     }
 
