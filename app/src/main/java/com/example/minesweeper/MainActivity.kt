@@ -242,7 +242,6 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         applySystemBarIcons(theme)
     }
 
-    /** Keeps status/navigation bar icons readable on both light and dark themes. */
     private fun showFlagColorDialog() {
         val activeTheme = loadTheme()
         val flagColors = listOf(
@@ -254,7 +253,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
             FlagColorInfo(R.string.flag_color_white, "#FFFFFF".toColorInt()),
             FlagColorInfo(R.string.flag_color_black, "#212121".toColorInt()),
         )
-        val currentFlagColor = if (viewModel.flagColor != -1) viewModel.flagColor else flagColors[0].color
+        val currentFlagColor = viewModel.flagColor
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_flag_picker, null)
         val gridView = dialogView.findViewById<android.widget.GridView>(R.id.flagGridView)
@@ -279,21 +278,10 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         }
 
         dialog.show()
-
-        val drawable = GradientDrawable().apply {
-            setColor(activeTheme.surfaceColor)
-            setStroke(dpToPx(2), activeTheme.secondaryCardColor)
-            cornerRadius = dpToPx(16).toFloat()
-        }
-        dialog.window?.setBackgroundDrawable(drawable)
-
-        val negativeBtn = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-        if (negativeBtn != null) {
-            negativeBtn.setTextColor(activeTheme.secondaryCardText)
-            (negativeBtn as? MaterialButton)?.backgroundTintList = ColorStateList.valueOf(activeTheme.secondaryCardColor)
-        }
+        styleDialog(dialog, activeTheme)
     }
 
+    /** Keeps status/navigation bar icons readable on both light and dark themes. */
     private fun applySystemBarIcons(theme: BoardTheme) {
         val lightBackground = ColorUtils.calculateLuminance(theme.surfaceColor) > 0.5
         WindowCompat.getInsetsController(window, window.decorView).apply {

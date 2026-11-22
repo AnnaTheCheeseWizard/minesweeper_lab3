@@ -70,7 +70,8 @@ class GameViewModel : ViewModel() {
 
     /** Load saved flag color preference. Returns -1 if none set. */
     fun loadFlagColor(prefs: SharedPreferences): Int {
-        return prefs.getInt(KEY_FLAG_COLOR, -1)
+        flagColor = prefs.getInt(KEY_FLAG_COLOR, -1)
+        return flagColor
     }
 
     /** Save flag color preference. */
