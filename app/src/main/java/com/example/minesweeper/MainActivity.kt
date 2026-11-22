@@ -69,11 +69,18 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
     private lateinit var stepButton: Button
 
     private var autoRunning = false
+    private var shownSeconds = -1
 
     private val timerRunnable = object : Runnable {
         override fun run() {
-            updateStatusTexts()
-            handler.postDelayed(this, TIMER_INTERVAL_MS)
+            val seconds = viewModel.elapsedSeconds()
+            if (seconds != shownSeconds) {
+                shownSeconds = seconds
+                timerText.text = getString(R.string.label_time, seconds)
+            }
+            if (viewModel.board.status == GameStatus.PLAYING) {
+                handler.postDelayed(this, TIMER_INTERVAL_MS)
+            }
         }
     }
 
@@ -145,11 +152,14 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     override fun onStart() {
         super.onStart()
+        viewModel.resumeTimer()
+        handler.removeCallbacks(timerRunnable)
         handler.post(timerRunnable)
     }
 
     override fun onStop() {
         super.onStop()
+        viewModel.pauseTimer()
         handler.removeCallbacks(timerRunnable)
         stopAuto()
     }
@@ -385,7 +395,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     // ---------------------------------------------------------------- touch input
 
-    override fun onCellTap(row: Int, col: Int) {
+    override fun onCellReveal(row: Int, col: Int) {
         stopAuto()
         clearHints()
         val board = viewModel.board
@@ -394,15 +404,15 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         } else {
             board.reveal(row, col)
         }
-        Timber.d("Tap at (%d, %d), changed=%b", row, col, changed)
+        Timber.d("Reveal/chord at (%d, %d), changed=%b", row, col, changed)
         afterBoardChanged()
     }
 
-    override fun onCellLongPress(row: Int, col: Int) {
+    override fun onCellFlag(row: Int, col: Int) {
         stopAuto()
         clearHints()
         val changed = viewModel.board.toggleFlag(row, col)
-        Timber.d("Long press at (%d, %d), flag toggled=%b", row, col, changed)
+        Timber.d("Flag toggled at (%d, %d), changed=%b", row, col, changed)
         afterBoardChanged()
     }
 
@@ -523,6 +533,10 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
 
     private fun afterBoardChanged(keepHint: Boolean = false) {
         viewModel.onBoardChanged()
+        if (viewModel.board.status == GameStatus.PLAYING) {
+            handler.removeCallbacks(timerRunnable)
+            handler.post(timerRunnable)
+        }
         if (!keepHint) hintText.setText(R.string.hint_default)
         boardView.refresh()
         updateStatusTexts()
@@ -624,7 +638,7 @@ class MainActivity : AppCompatActivity(), BoardView.Listener {
         const val KEY_THEME = "theme"
         const val KEY_DIFFICULTY = "difficulty"
         const val KEY_BEST_TIME_PREFIX = "best_time_"
-        const val TIMER_INTERVAL_MS = 500L
+        const val TIMER_INTERVAL_MS = 250L
         const val AUTO_DELAY_MS = 500L
     }
 }

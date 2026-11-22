@@ -32,8 +32,8 @@ class BoardView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     interface Listener {
-        fun onCellTap(row: Int, col: Int)
-        fun onCellLongPress(row: Int, col: Int)
+        fun onCellReveal(row: Int, col: Int)
+        fun onCellFlag(row: Int, col: Int)
     }
 
     var listener: Listener? = null
@@ -80,15 +80,15 @@ class BoardView @JvmOverloads constructor(
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 performClick()
                 withCellAt(e.x, e.y) { row, col ->
-                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    listener?.onCellLongPress(row, col)
+                    performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    listener?.onCellFlag(row, col)
                 }
                 return true
             }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 performClick()
-                withCellAt(e.x, e.y) { row, col -> listener?.onCellTap(row, col) }
+                withCellAt(e.x, e.y) { row, col -> listener?.onCellReveal(row, col) }
                 return true
             }
         },

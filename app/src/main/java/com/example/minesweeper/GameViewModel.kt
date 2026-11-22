@@ -1,8 +1,8 @@
 package com.example.minesweeper
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.SystemClock
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import com.example.minesweeper.game.Board
 import com.example.minesweeper.game.Difficulty
@@ -33,6 +33,7 @@ class GameViewModel : ViewModel() {
     private var initialized = false
     private var startedAtMs = 0L
     private var finishedAtMs = 0L
+    private var pausedAtMs = 0L
 
     fun initIfNeeded(initialDifficulty: Difficulty) {
         if (initialized) return
@@ -45,8 +46,22 @@ class GameViewModel : ViewModel() {
         board = Board(newDifficulty)
         startedAtMs = 0L
         finishedAtMs = 0L
+        pausedAtMs = 0L
         resultShown = false
         isAssisted = false
+    }
+
+    fun pauseTimer() {
+        if (startedAtMs != 0L && finishedAtMs == 0L && (pausedAtMs == 0L)) {
+            pausedAtMs = SystemClock.elapsedRealtime()
+        }
+    }
+
+    fun resumeTimer() {
+        if (pausedAtMs != 0L) {
+            startedAtMs += SystemClock.elapsedRealtime() - pausedAtMs
+            pausedAtMs = 0L
+        }
     }
 
     /** Must be called after every change of the board to keep the timer in sync. */
@@ -61,11 +76,13 @@ class GameViewModel : ViewModel() {
     }
 
     fun elapsedSeconds(): Int {
-        return when {
-            startedAtMs == 0L -> 0
-            finishedAtMs != 0L -> ((finishedAtMs - startedAtMs) / 1000).toInt()
-            else -> ((SystemClock.elapsedRealtime() - startedAtMs) / 1000).toInt()
+        val end = when {
+            startedAtMs == 0L -> return 0
+            finishedAtMs != 0L -> finishedAtMs
+            pausedAtMs != 0L -> pausedAtMs
+            else -> SystemClock.elapsedRealtime()
         }
+        return ((end - startedAtMs) / 1000).toInt()
     }
 
     /** Load saved flag color preference. Returns -1 if none set. */
@@ -77,7 +94,7 @@ class GameViewModel : ViewModel() {
     /** Save flag color preference. */
     fun saveFlagColor(prefs: SharedPreferences, color: Int) {
         flagColor = color
-        prefs.edit().putInt(KEY_FLAG_COLOR, color).apply()
+        prefs.edit { putInt(KEY_FLAG_COLOR, color) }
     }
 
     private companion object {

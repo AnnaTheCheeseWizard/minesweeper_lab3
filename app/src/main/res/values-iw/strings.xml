@@ -63,7 +63,7 @@
     <string name="language_system">שפת המערכת</string>
 
     <!-- Hints and solver messages -->
-    <string name="hint_default">הקשה — חשיפת משבצת, לחיצה ארוכה — סימון דגל, הקשה על מספר — חשיפת המשבצות הסמוכות.</string>
+    <string name="hint_default">הקשה אחת — דגל, הקשה כפולה — חשיפת משבצת או פתיחת המשבצות הסמוכות.</string>
     <string name="hint_none">האלגוריתם לא מצא מהלך למצב הזה.</string>
     <plurals name="hint_moves_found">
         <item quantity="one">נמצא מהלך ודאי אחד</item>
