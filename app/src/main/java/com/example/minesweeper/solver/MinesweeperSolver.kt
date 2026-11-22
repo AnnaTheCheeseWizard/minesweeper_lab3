@@ -66,6 +66,7 @@ class MinesweeperSolver(private val nodeBudget: Int = DEFAULT_NODE_BUDGET) {
 
     private fun buildConstraints(snapshot: BoardSnapshot): List<Constraint> {
         val result = ArrayList<Constraint>()
+        val seen = HashSet<String>()
         for (i in snapshot.cells.indices) {
             val value = snapshot.cells[i]
             if (value < 0) continue
@@ -73,6 +74,7 @@ class MinesweeperSolver(private val nodeBudget: Int = DEFAULT_NODE_BUDGET) {
                 .filter { snapshot.cells[it] < 0 }
                 .sorted()
             if (unknown.isEmpty()) continue
+            if (!seen.add("$value:${unknown.joinToString(",")}")) continue
             result.add(Constraint(unknown.toIntArray(), value))
         }
         return result
@@ -256,8 +258,13 @@ class MinesweeperSolver(private val nodeBudget: Int = DEFAULT_NODE_BUDGET) {
         val polynomials = components.map { comp ->
             List(comp.counts.size) { k -> BigInteger.valueOf(comp.counts[k]) }
         }
-        var full: List<BigInteger> = listOf(BigInteger.ONE)
-        for (p in polynomials) full = convolve(full, p, limit)
+        val one = listOf(BigInteger.ONE)
+        val prefix = ArrayList<List<BigInteger>>(polynomials.size + 1)
+        prefix.add(one)
+        for (p in polynomials) prefix.add(convolve(prefix.last(), p, limit))
+        val suffix = Array(polynomials.size + 1) { one }
+        for (j in polynomials.indices.reversed()) suffix[j] = convolve(polynomials[j], suffix[j + 1], limit)
+        val full: List<BigInteger> = prefix.last()
 
         var total = BigInteger.ZERO
         for (s in full.indices) total += full[s] * waysFor(totalMines - s)
@@ -271,10 +278,7 @@ class MinesweeperSolver(private val nodeBudget: Int = DEFAULT_NODE_BUDGET) {
         val mineCells = ArrayList<Int>()
 
         for (i in components.indices) {
-            var others: List<BigInteger> = listOf(BigInteger.ONE)
-            for (j in components.indices) {
-                if (j != i) others = convolve(others, polynomials[j], limit)
-            }
+            val others = convolve(prefix[i], suffix[i + 1], limit)
             val comp = components[i]
             val weightForK = Array(comp.counts.size) { k ->
                 var w = BigInteger.ZERO

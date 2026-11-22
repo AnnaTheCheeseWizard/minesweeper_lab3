@@ -16,45 +16,11 @@
     <color name="on_surface">#FFFFFF</color>
     <color name="outline">#98CE71</color>
 
-    <!-- Card & Button Backgrounds -->
-    <color name="card_stat_background">#E1788B</color>
-    <color name="card_stat_stroke">#E59EAB</color>
-    <color name="card_stat_text">#FFFFFF</color>
-
-    <color name="card_board_background">#388E2A</color>
-    <color name="card_board_stroke">#7EBF50</color>
-
-    <!-- Board Drawing Colors -->
-    <color name="board_background">#388E2A</color>
-
-    <!-- Hidden Field Cells: #7EBF50 & #98CE71 Checkerboard -->
-    <color name="cell_hidden">#7EBF50</color>
-    <color name="cell_hidden_alt">#98CE71</color>
-    <color name="cell_hidden_edge">#98CE71</color>
-    <color name="cell_hidden_shadow">#388E2A</color>
-
-    <!-- Solved Field Cells: #E1788B & #E59EAB Checkerboard -->
-    <color name="cell_revealed">#E1788B</color>
-    <color name="cell_revealed_alt">#E59EAB</color>
-
     <color name="cell_exploded">#D32F2F</color>
-    <color name="mine">#212121</color>
-    <color name="mine_core">#FFFFFF</color>
-    <color name="flag">#FFFFFF</color>
 
     <color name="hint_safe">#7EBF50</color>
     <color name="hint_mine">#D32F2F</color>
     <color name="hint_guess">#FFB74D</color>
-
-    <!-- Number Colors (High contrast on pink cells) -->
-    <color name="number_1">#1565C0</color>
-    <color name="number_2">#1B5E20</color>
-    <color name="number_3">#C62828</color>
-    <color name="number_4">#4A148C</color>
-    <color name="number_5">#4E342E</color>
-    <color name="number_6">#00695C</color>
-    <color name="number_7">#212121</color>
-    <color name="number_8">#37474F</color>
 
     <color name="ic_launcher_background">#388E2A</color>
 </resources>
