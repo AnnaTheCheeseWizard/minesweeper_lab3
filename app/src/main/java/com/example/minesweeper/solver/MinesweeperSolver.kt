@@ -533,7 +533,7 @@ class MinesweeperSolver(private val nodeBudget: Int = DEFAULT_NODE_BUDGET) {
         )
     }
 
-    /** Row of binomial coefficients C(n, 0..maxK). */
+    /** Row of binomial coefficients C(n, 0.maxK). */
     private fun binomialRow(n: Int, maxK: Int): Array<BigInteger> {
         val row = Array<BigInteger>(maxK + 1) { BigInteger.ZERO }
         row[0] = BigInteger.ONE
